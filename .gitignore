@@ -1,0 +1,111 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+
+# Build output
+coin-indexer
+coin-indexor
+build/
+dist/
+
+# IDE and editor files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+coin_indexer.db
+
+# Configuration files with sensitive data
+config/config.local.yaml
+config/config.prod.yaml
+config/.env
+.env
+.env.local
+.env.production
+
+# Node modules (if using any frontend tools)
+node_modules/
+
+# Generated files
+internal/graphql/generated.go
+internal/graphql/models_gen.go
+
+# Temporary files
+tmp/
+temp/
+
+# Coverage reports
+coverage.txt
+coverage.html
+*.cover
+
+# Profiling files
+*.prof
+*.pprof
+
+# Air live reload tool
+tmp/
+
+# Test cache
+testdata/
+
+# Backup files
+*.bak
+*.backup
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Local development
+local/
+dev/
+
+# Docker
+.dockerignore
+
+# Ethereum node data (if running local node)
+geth/
+ethereum/
+
+# API keys and secrets
+*.key
+*.pem
+secrets/
+keys/

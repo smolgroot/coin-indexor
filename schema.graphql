@@ -1,0 +1,77 @@
+# GraphQL schema for coin indexer
+type Transaction {
+  id: ID!
+  txHash: String!
+  blockNumber: Int!
+  logIndex: Int!
+  contractAddress: String!
+  tokenName: String!
+  fromAddress: String!
+  toAddress: String!
+  amount: String!
+  priceUSD: Float
+  valueUSD: Float
+  blockTimestamp: String!
+  createdAt: String!
+}
+
+type Contract {
+  id: ID!
+  name: String!
+  address: String!
+  startBlock: Int!
+  lastBlock: Int!
+  isActive: Boolean!
+  createdAt: String!
+  transactions: [Transaction!]!
+}
+
+type Query {
+  # Get transactions with optional filtering
+  transactions(
+    limit: Int = 10
+    offset: Int = 0
+    contractAddress: String
+    fromAddress: String
+    toAddress: String
+    tokenName: String
+    fromBlock: Int
+    toBlock: Int
+  ): [Transaction!]!
+  
+  # Get a specific transaction by ID
+  transaction(id: ID!): Transaction
+  
+  # Get all monitored contracts
+  contracts: [Contract!]!
+  
+  # Get a specific contract
+  contract(address: String!): Contract
+  
+  # Get transaction count for statistics
+  transactionCount(contractAddress: String): Int!
+  
+  # Get transactions for a specific address (sent or received)
+  addressTransactions(
+    address: String!
+    limit: Int = 10
+    offset: Int = 0
+  ): [Transaction!]!
+  
+  # Get price history for charting (aggregated by time intervals)
+  priceHistory(
+    contractAddress: String!
+    interval: String! = "1h" # 1m, 5m, 15m, 1h, 4h, 1d
+    from: String!
+    to: String!
+  ): [PricePoint!]!
+}
+
+type PricePoint {
+  timestamp: String!
+  open: Float!
+  high: Float!
+  low: Float!
+  close: Float!
+  volume: String!
+}

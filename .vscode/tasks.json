@@ -1,0 +1,40 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Coin Indexer",
+            "type": "shell",
+            "command": "go",
+            "args": ["build", "."],
+            "group": "build",
+            "problemMatcher": ["$go"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Run GraphQL Server",
+            "type": "shell",
+            "command": "go",
+            "args": ["run", "main.go", "server"],
+            "group": "build",
+            "problemMatcher": ["$go"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true
+        },
+        {
+            "label": "Start Indexer",
+            "type": "shell",
+            "command": "go",
+            "args": ["run", "main.go", "index"],
+            "group": "build",
+            "problemMatcher": ["$go"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true
+        }
+    ]
+}
