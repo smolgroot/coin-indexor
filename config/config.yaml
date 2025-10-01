@@ -1,7 +1,7 @@
 # Configuration for different environments
 
 server:
-  port: "8082"
+  port: "8084"
   host: "localhost"
 
 database:
@@ -35,7 +35,7 @@ contracts:
       start_block: 18500000
       abi_file: "abis/erc20.json"
     - name: "GETH"
-      address: "0x10C6E9530F1C1AF873a391030a1D9E8ed0630D26" 
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3" 
       start_block: 1
       abi_file: "abis/erc20.json"
     # Add more contracts as needed

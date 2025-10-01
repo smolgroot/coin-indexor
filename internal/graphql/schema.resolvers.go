@@ -88,22 +88,117 @@ func (r *queryResolver) Transaction(ctx context.Context, id string) (*Transactio
 
 // Contracts is the resolver for the contracts field.
 func (r *queryResolver) Contracts(ctx context.Context) ([]*Contract, error) {
-	panic(fmt.Errorf("not implemented: Contracts - contracts"))
+	db := database.GetDB()
+	
+	var dbContracts []models.Contract
+	if err := db.Find(&dbContracts).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch contracts: %w", err)
+	}
+	
+	// Convert to GraphQL types
+	var contracts []*Contract
+	for _, c := range dbContracts {
+		gqlContract := &Contract{
+			ID:         strconv.Itoa(int(c.ID)),
+			Name:       c.Name,
+			Address:    c.Address,
+			StartBlock: int(c.StartBlock),
+			LastBlock:  int(c.LastBlock),
+			IsActive:   c.IsActive,
+			CreatedAt:  c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		}
+		contracts = append(contracts, gqlContract)
+	}
+	
+	return contracts, nil
 }
 
 // Contract is the resolver for the contract field.
 func (r *queryResolver) Contract(ctx context.Context, address string) (*Contract, error) {
-	panic(fmt.Errorf("not implemented: Contract - contract"))
+	db := database.GetDB()
+	
+	var contract models.Contract
+	if err := db.Where("address = ?", address).First(&contract).Error; err != nil {
+		return nil, fmt.Errorf("contract not found: %w", err)
+	}
+	
+	gqlContract := &Contract{
+		ID:         strconv.Itoa(int(contract.ID)),
+		Name:       contract.Name,
+		Address:    contract.Address,
+		StartBlock: int(contract.StartBlock),
+		LastBlock:  int(contract.LastBlock),
+		IsActive:   contract.IsActive,
+		CreatedAt:  contract.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+	}
+	
+	return gqlContract, nil
 }
 
 // TransactionCount is the resolver for the transactionCount field.
 func (r *queryResolver) TransactionCount(ctx context.Context, contractAddress *string) (int, error) {
-	panic(fmt.Errorf("not implemented: TransactionCount - transactionCount"))
+	db := database.GetDB()
+	
+	query := db.Model(&models.Transaction{})
+	if contractAddress != nil {
+		query = query.Where("contract_address = ?", *contractAddress)
+	}
+	
+	var count int64
+	if err := query.Count(&count).Error; err != nil {
+		return 0, fmt.Errorf("failed to count transactions: %w", err)
+	}
+	
+	return int(count), nil
 }
 
 // AddressTransactions is the resolver for the addressTransactions field.
 func (r *queryResolver) AddressTransactions(ctx context.Context, address string, limit *int, offset *int) ([]*Transaction, error) {
-	panic(fmt.Errorf("not implemented: AddressTransactions - addressTransactions"))
+	db := database.GetDB()
+	
+	query := db.Model(&models.Transaction{}).
+		Where("from_address = ? OR to_address = ?", address, address)
+	
+	if offset != nil {
+		query = query.Offset(*offset)
+	}
+	if limit != nil {
+		query = query.Limit(*limit)
+	}
+	
+	var dbTransactions []models.Transaction
+	if err := query.Order("block_number DESC, log_index DESC").Find(&dbTransactions).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch address transactions: %w", err)
+	}
+	
+	// Convert to GraphQL types
+	var transactions []*Transaction
+	for _, tx := range dbTransactions {
+		gqlTx := &Transaction{
+			ID:              strconv.Itoa(int(tx.ID)),
+			TxHash:          tx.TxHash,
+			BlockNumber:     int(tx.BlockNumber),
+			LogIndex:        int(tx.LogIndex),
+			ContractAddress: tx.ContractAddress,
+			TokenName:       tx.TokenName,
+			FromAddress:     tx.FromAddress,
+			ToAddress:       tx.ToAddress,
+			Amount:          tx.Amount,
+			BlockTimestamp:  tx.BlockTimestamp.Format("2006-01-02T15:04:05Z07:00"),
+			CreatedAt:       tx.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		}
+		
+		if tx.PriceUSD != nil {
+			gqlTx.PriceUsd = tx.PriceUSD
+		}
+		if tx.ValueUSD != nil {
+			gqlTx.ValueUsd = tx.ValueUSD
+		}
+		
+		transactions = append(transactions, gqlTx)
+	}
+	
+	return transactions, nil
 }
 
 // PriceHistory is the resolver for the priceHistory field.

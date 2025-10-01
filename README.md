@@ -38,7 +38,7 @@ go run main.go index
 go run main.go server
 ```
 
-Visit `http://localhost:8080/playground` to explore the GraphQL API!
+Visit `http://localhost:8083/playground` to explore the GraphQL API!
 
 ## GraphQL API Examples
 

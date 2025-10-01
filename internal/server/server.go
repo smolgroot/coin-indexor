@@ -12,6 +12,7 @@ import (
 	
 	"github.com/user/coin-indexer/internal/database"
 	"github.com/user/coin-indexer/internal/graphql"
+	"github.com/user/coin-indexer/internal/models"
 )
 
 type Server struct {
@@ -95,8 +96,30 @@ func addContractHandler(c *gin.Context) {
 		return
 	}
 	
-	// TODO: Add validation for Ethereum address format
-	// TODO: Add the contract to database and start monitoring
+	log.Printf("DEBUG: Received request: %+v", req)
+	
+	// Create new contract record
+	contract := models.Contract{
+		Name:       req.Name,
+		Address:    req.Address,
+		StartBlock: req.StartBlock,
+		LastBlock:  0,
+		IsActive:   true,
+	}
+	
+	log.Printf("DEBUG: Created contract model: %+v", contract)
+	
+	// Save to database
+	db := database.GetDB()
+	log.Printf("DEBUG: Database instance: %v (nil? %t)", db, db == nil)
+	
+	if err := db.Create(&contract).Error; err != nil {
+		log.Printf("DEBUG: Database create error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save contract to database"})
+		return
+	}
+	
+	log.Printf("DEBUG: Contract saved successfully with ID: %d", contract.ID)
 	
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Contract added successfully",
